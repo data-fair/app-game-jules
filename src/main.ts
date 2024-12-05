@@ -183,7 +183,7 @@ console.log('Data: ', data);
     let end_time = new Date(Date.now() + 50000);
     app.ticker.add(() => {
         let time_left = Math.max(0, end_time.getTime() - Date.now());
-        document.getElementById('points_finished')!.innerHTML = `${points} points et tu fais ${Math.round(points / 50)} kills par seconde, avec une précision de ${Math.round((points / shoot) * 100)}%`;
+        document.getElementById('points_finished')!.innerHTML = `${points} points et tu fais ${(points / 50)} kills par seconde, avec une précision de ${Math.round((points / shoot) * 100)}%`;
         let stars: any = document.querySelector('.stars');
         stars.innerHTML = '';
         if (points >= 25) {
