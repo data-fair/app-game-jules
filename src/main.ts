@@ -285,20 +285,20 @@ graphics2.on('click', (event) => {
         }, 100);
     };
 
-    let end_time = new Date(Date.now() + 20000);
+    let end_time = new Date(Date.now() + 50000);
     app.ticker.add(() => {
         let time_left = Math.max(0, end_time.getTime() - Date.now());
         document.getElementById('points_finished')!.innerHTML = `${points} points et tu fais ${(points / 50)} kills par seconde, avec une précision de ${Math.round((points / shoot) * 100)}%`;
         let stars: any = document.querySelector('.stars');
         stars.innerHTML = '';
         if (points >= 25) {
-            stars.innerHTML += '*';
+            stars.innerHTML += '<img width="50" src="https://static.vecteezy.com/system/resources/thumbnails/036/626/964/small_2x/ai-generated-gold-star-on-transparent-background-png.png">';
         }
         if (points >= 15) {
-            stars.innerHTML += '*';
+            stars.innerHTML += '<img width="50" src="https://static.vecteezy.com/system/resources/thumbnails/036/626/964/small_2x/ai-generated-gold-star-on-transparent-background-png.png">';
         }
         if (points >= 10) {
-            stars.innerHTML += '*';
+            stars.innerHTML += '<img width="50" src="https://static.vecteezy.com/system/resources/thumbnails/036/626/964/small_2x/ai-generated-gold-star-on-transparent-background-png.png">';
         }
         if (time_left <= 0) {
             game_finished = true
