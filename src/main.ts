@@ -57,8 +57,8 @@ console.log('Data: ', data);
     background.height = app.renderer.height
     app.stage.addChildAt(background, 0)
 
-    const textures = await PIXI.Assets.load('/point.png')
-    const graphics1 = new PIXI.Sprite(textures)
+    const textures  = await PIXI.Assets.load('/point.png')
+    const graphics1        = new PIXI.Sprite(textures)
     const graphics2 = new PIXI.Sprite(textures)
     graphics1.height = graphics2.height = 50
     graphics1.width = graphics2.width = 50
@@ -96,7 +96,7 @@ console.log('Data: ', data);
 
     app.ticker.maxFPS = 10
 
-    let killeds = []
+    let killeds: any = []
     let shoot = 0
 
     // Initialisation des premières données
@@ -305,8 +305,7 @@ graphics2.on('click', (event) => {
             const finished_menu: any = document.querySelector('.finished_menu');
             finished_menu.style.height = '60%';
 
-            console.log(killeds)
-            killeds = killeds.filter((item, index) => killeds.indexOf(item) === index);            
+            killeds = killeds.filter((item: any, index: any) => killeds.indexOf(item) === index);            
 
             const killed_names: any = document.querySelector('#killeds');
             killed_names.innerHTML = '<tr><th>Vous avez tué... </th></tr>';
