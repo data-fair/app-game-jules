@@ -74,9 +74,9 @@ console.log('Data: ', data);
     let response_1 = await fetch(`https://koumoul.com/data-fair/api/v1/datasets/fichier-personnes-decedees/values_agg?qs=(prenom:(%22${name_1}%22))&size=0&field=date_mort&interval=year&agg_size=100&sort=date_mort&finalizedAt=2024-11-15T23:23:27.104Z`);
     let datas_1 = await response_1.json()
 
-    const name_2 = availableNames[Math.floor(Math.random() * availableNames.length)];
-    const response_2 = await fetch(`https://koumoul.com/data-fair/api/v1/datasets/fichier-personnes-decedees/values_agg?qs=(prenom:(%22${name_2}%22))&size=0&field=date_mort&interval=year&agg_size=100&sort=date_mort&finalizedAt=2024-11-15T23:23:27.104Z`);
-    const datas_2 = await response_2.json()
+    let name_2 = availableNames[Math.floor(Math.random() * availableNames.length)];
+    let response_2 = await fetch(`https://koumoul.com/data-fair/api/v1/datasets/fichier-personnes-decedees/values_agg?qs=(prenom:(%22${name_2}%22))&size=0&field=date_mort&interval=year&agg_size=100&sort=date_mort&finalizedAt=2024-11-15T23:23:27.104Z`);
+    let datas_2 = await response_2.json()
     let graphics_2_datas: any = datas_2['aggs'].map((bucket: any) => ({
         x: new Date(bucket.value).getFullYear(),
         y: bucket.total
@@ -96,6 +96,7 @@ console.log('Data: ', data);
 
     app.ticker.maxFPS = 10
 
+    let killeds = []
     let shoot = 0
 
     // Initialisation des premières données
@@ -109,6 +110,8 @@ console.log('Data: ', data);
         }
         return acc;
     }, []);
+
+
 
     // Déplacements du sprite 1
     app.ticker.add( () => {
@@ -125,12 +128,17 @@ console.log('Data: ', data);
             graphics1_points = 1;
         }
 
-
+        // Changer la velurs de division pour modifier le "degré de smooth"
         // Déplacements
-        graphics1.x += graphics1_direction * (app.renderer.width / graphics_1_datas.length);
-
+        for (let i = 0; i < 4; i++) {
+            graphics1.x += graphics1_direction * (app.renderer.width / graphics_1_datas.length) / 4;
+            new Promise(resolve => setTimeout(resolve, 10));
+        }
+        
         try {
-            graphics1.y = (graphics_1_datas[graphics1_points].y / app.renderer.height * 400) + 100;
+            if (newDatasRequired1 === false) { 
+                graphics1.y += (graphics_1_datas[graphics1_points].y / app.renderer.height * 400 + 100 - graphics1.y) * 0.5;
+            }
         } catch (error) {
             console.error('Erreur lors du calcul de la position y:', error);
         }
@@ -142,8 +150,7 @@ console.log('Data: ', data);
 
         if (newDatasRequired1) {
             newDatasRequired1 = false;
-            let name_1 = availableNames[Math.floor(Math.random() * availableNames.length)];
-            document.getElementById('name')!.innerHTML = name_1;
+            name_1 = availableNames[Math.floor(Math.random() * availableNames.length)];
             fetch(`https://koumoul.com/data-fair/api/v1/datasets/fichier-personnes-decedees/values_agg?qs=(prenom:(%22${name_1}%22))&size=0&field=date_mort&interval=year&agg_size=100&sort=date_mort&finalizedAt=2024-11-15T23:23:27.104Z`)
                 .then(response => response.json())
                 .then(datas_1 => {
@@ -175,19 +182,29 @@ console.log('Data: ', data);
 
 
         // Déplacements
-        graphics2.x += graphics2_direction * (app.renderer.width / graphics_2_datas.length);
+        for (let i = 0; i < 4; i++) {
+            graphics2.x += graphics2_direction * (app.renderer.width / graphics_2_datas.length) / 4;
+            new Promise(resolve => setTimeout(resolve, 10));
+        }
 
-        try {
-            graphics2.y = (graphics_2_datas[graphics2_points].y / app.renderer.height * 400) + 100;
-        } catch (error) {
-            console.error('Erreur lors du calcul de la position y:', error);
+        if (graphics2_points < graphics_2_datas.length) {
+            try {
+                graphics2.y += (graphics_2_datas[graphics2_points].y / app.renderer.height * 400 + 100 - graphics2.y) * 0.5;
+            } catch (error) {
+                console.error('Erreur lors du calcul de la position y:', error);
+            }
         }
 
         // Mise à jour de la valeur des points
         graphics2_points += 1;        
         if (newDatasRequired2) {
             newDatasRequired2 = false;
-            let name_2 = availableNames[Math.floor(Math.random() * availableNames.length)];
+            console.log(availableNames)
+            name_2 = availableNames[Math.floor(Math.random() * availableNames.length)];
+            while (killeds.includes(name_2)) {
+                name_2 = availableNames[Math.floor(Math.random() * availableNames.length)];
+            }
+            console.log('New name: ', name_2)
             document.getElementById('name')!.innerHTML = name_2;
             fetch(`https://koumoul.com/data-fair/api/v1/datasets/fichier-personnes-decedees/values_agg?qs=(prenom:(%22${name_2}%22))&size=0&field=date_mort&interval=year&agg_size=100&sort=date_mort&finalizedAt=2024-11-15T23:23:27.104Z`)
                 .then(response => response.json())
@@ -211,7 +228,9 @@ console.log('Data: ', data);
 
 graphics1.interactive = true;
 graphics1.on('click', (event) => {
-    console.log('CLicked')
+    graphics1.x = 0
+    killeds.push(name_1)
+    console.log(name_1)
     if (!sprite.playing && !game_finished) {
         points += 1
         graphics1_direction = -graphics1_direction  
@@ -232,7 +251,7 @@ graphics1.on('click', (event) => {
 
 graphics2.interactive = true;
 graphics2.on('click', (event) => {
-    console.log('CLicked')
+    killeds.push(name_2)
     if (!sprite.playing && !game_finished) {
         points += 1
         graphics2_direction = -graphics2_direction  
@@ -251,6 +270,7 @@ graphics2.on('click', (event) => {
     }
 })
     app.canvas.onclick = () => {
+        if (game_finished) return
         shoot += 1
         sound.play('gun');
         let destory = new PIXI.AnimatedSprite(explosionTextures);
@@ -265,7 +285,7 @@ graphics2.on('click', (event) => {
         }, 100);
     };
 
-    let end_time = new Date(Date.now() + 50000);
+    let end_time = new Date(Date.now() + 20000);
     app.ticker.add(() => {
         let time_left = Math.max(0, end_time.getTime() - Date.now());
         document.getElementById('points_finished')!.innerHTML = `${points} points et tu fais ${(points / 50)} kills par seconde, avec une précision de ${Math.round((points / shoot) * 100)}%`;
@@ -284,6 +304,16 @@ graphics2.on('click', (event) => {
             game_finished = true
             const finished_menu: any = document.querySelector('.finished_menu');
             finished_menu.style.height = '60%';
+
+            console.log(killeds)
+            killeds = killeds.filter((item, index) => killeds.indexOf(item) === index);            
+
+            const killed_names: any = document.querySelector('#killeds');
+            killed_names.innerHTML = '<tr><th>Vous avez tué... </th></tr>';
+            for (let i = 0; i < killeds.length; i++) {
+                killed_names.innerHTML += `<tr><td>${killeds[i]}</td></tr>`;
+            }
+
             app.ticker.stop();
         }
     });
